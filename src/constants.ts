@@ -1,11 +1,11 @@
-export const ADDON_ID = "storybook/my-addon";
-export const TOOL_ID = `${ADDON_ID}/tool`;
-export const PANEL_ID = `${ADDON_ID}/panel`;
-export const TAB_ID = `${ADDON_ID}/tab`;
-export const PARAM_KEY = `myAddonParameter`;
+export const ADDON_ID = 'storybook/viewport'
+export const PARAM_KEY = 'viewport'
+export const PANEL_ID = `${ADDON_ID}/viewport-panel`
 
-export const EVENTS = {
-  RESULT: `${ADDON_ID}/result`,
-  REQUEST: `${ADDON_ID}/request`,
-  CLEAR: `${ADDON_ID}/clear`,
-};
+export default {
+  UPDATE: `${ADDON_ID}/update`,
+  CONFIGURE: `${ADDON_ID}/configure`,
+  SET: `${ADDON_ID}/setStoryDefaultViewport`,
+  CHANGED: `${ADDON_ID}/viewportChanged`,
+  SHOW_BOARDER: `${ADDON_ID}/boarderChanged`,
+}
