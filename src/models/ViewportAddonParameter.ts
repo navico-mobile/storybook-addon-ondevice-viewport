@@ -4,4 +4,5 @@ export interface ViewportAddonParameter {
   disable?: boolean
   defaultViewport?: string
   viewports?: ViewportMap
+  showBoarder?: boolean
 }

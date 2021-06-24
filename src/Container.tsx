@@ -6,6 +6,7 @@ import { Channel } from './ViewportPanel'
 
 interface ContainerProps {
   initialViewport?: Viewport
+  showBoarder?: boolean
   channel: Channel
   children?: React.ReactNode
 }
@@ -31,18 +32,19 @@ export default class Container extends React.Component<ContainerProps, Container
       styles: { width: this.hostWindow.width, height: this.hostWindow.height },
       type: 'other',
     }
-    this.state = { viewport: viewport, showBoarder: false }
+    const showBoarder = props.showBoarder || false
+    this.state = { viewport: viewport, showBoarder }
   }
 
   componentDidMount() {
     const { channel } = this.props
-    channel.on(Constants.UPDATE, this.onViewportChange)
+    channel.on(Constants.CHANGED, this.onViewportChange)
     channel.on(Constants.SHOW_BOARDER, this.onShowBoarderChange)
   }
 
   componentWillUnmount() {
     const { channel } = this.props
-    channel.removeListener(Constants.UPDATE, this.onViewportChange)
+    channel.removeListener(Constants.CHANGED, this.onViewportChange)
     channel.removeListener(Constants.SHOW_BOARDER, this.onShowBoarderChange)
   }
 
@@ -68,7 +70,9 @@ export default class Container extends React.Component<ContainerProps, Container
     const { children } = this.props
     const newWidthHeight = {
       width: Number(viewport?.styles.width),
+      maxWidth: Number(viewport?.styles.width),
       height: Number(viewport?.styles.height),
+      maxHeight: Number(viewport?.styles.height),
     }
     const boarderStyle = showBoarder ? styles.borderStyle : undefined
     return <View style={[styles.container, newWidthHeight, boarderStyle]}>{children}</View>

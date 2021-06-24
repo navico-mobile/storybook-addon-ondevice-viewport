@@ -15,7 +15,7 @@ import { API } from '@storybook/api'
 import Events from './constants'
 
 import { INITIAL_VIEWPORTS, DEFAULT_VIEWPORT_NAME } from './defaults'
-import { Viewport, ViewportMap } from './models'
+import { Viewport, ViewportMap, ViewportAddonParameter } from './models'
 
 export type Channel = ReturnType<AddonStore['getChannel']>
 interface Props {
@@ -54,6 +54,8 @@ const styles = StyleSheet.create({
 interface States {
   selected: string
   showBoarder: boolean
+  disable: boolean
+  viewports: ViewportMap
 }
 
 function getValidViewports(viewportMap: ViewportMap, defaultWindow: ScaledSize): Viewport[] {
@@ -67,17 +69,37 @@ function getValidViewports(viewportMap: ViewportMap, defaultWindow: ScaledSize):
   }
   return [defaultViewport, ...samllerThanWindow]
 }
-
+const defaultState = {
+  selected: DEFAULT_VIEWPORT_NAME,
+  showBoarder: false,
+  viewports: INITIAL_VIEWPORTS,
+  disable: false,
+}
 export default class ViewportPanel extends React.Component<Props, States> {
   constructor(props: Props) {
     super(props)
-    this.state = { selected: DEFAULT_VIEWPORT_NAME, showBoarder: false }
+    this.state = defaultState
+  }
+  componentDidMount() {
+    this.props.channel.on(Events.SET, this.onSetParameters)
+  }
+
+  componentWillUnmount() {
+    this.props.channel.removeListener(Events.SET, this.onSetParameters)
+  }
+
+  onSetParameters = (parameters: ViewportAddonParameter) => {
+    const selected = parameters.defaultViewport || defaultState.selected
+    const disable = parameters.disable || defaultState.disable
+    const showBoarder = parameters.showBoarder || defaultState.showBoarder
+    const viewports = parameters.viewports || defaultState.viewports
+    this.setState({ showBoarder, viewports, disable, selected })
   }
 
   onViewportSelect = (viewport: Viewport) => {
     const { channel } = this.props
     this.setState({ selected: viewport.name })
-    channel.emit(Events.UPDATE, JSON.stringify(viewport))
+    channel.emit(Events.CHANGED, JSON.stringify(viewport))
   }
   onViewportBorderChanged = (showBoarder: boolean) => {
     const { channel } = this.props
@@ -102,26 +124,24 @@ export default class ViewportPanel extends React.Component<Props, States> {
 
   render() {
     const { active } = this.props
-    const { selected, showBoarder } = this.state
-    if (!active) {
+    if (!active || !this.state) {
       return null
     }
-    const viewports = getValidViewports(INITIAL_VIEWPORTS, Dimensions.get('window'))
+    const { selected, showBoarder, disable, viewports } = this.state
+    if (disable) {
+      return <View>{`Viewport is disabled`}</View>
+    }
+
+    const viewportsList = getValidViewports(viewports, Dimensions.get('window'))
     return (
       <View style={styles.container}>
         <View style={styles.switchContainer}>
           <Text>{'Show viewport border: '}</Text>
-          <Switch
-            // trackColor={{ false: "#767577", true: "#81b0ff" }}
-            // thumbColor={showBoarder ? "#f5dd4b" : "#f4f3f4"}
-            // ios_backgroundColor="#3e3e3e"
-            onValueChange={this.onViewportBorderChanged}
-            value={showBoarder}
-          />
+          <Switch onValueChange={this.onViewportBorderChanged} value={showBoarder} />
         </View>
 
         <FlatList
-          data={viewports}
+          data={viewportsList}
           renderItem={this.renderItem}
           keyExtractor={(item) => item.name}
           extraData={selected}
