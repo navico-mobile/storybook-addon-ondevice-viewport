@@ -33,7 +33,6 @@ var Container = /** @class */ (function (_super) {
         _this.onViewportChange = function (viewportString) {
             try {
                 var viewport = JSON.parse(viewportString);
-                console.warn("viewport changed " + JSON.stringify(viewport));
                 _this.setState({ viewport: viewport });
             }
             catch (e) {
@@ -42,7 +41,6 @@ var Container = /** @class */ (function (_super) {
         };
         _this.onShowBoarderChange = function (showBoarder) {
             try {
-                console.warn("viewport show boarder " + showBoarder);
                 _this.setState({ showBoarder: showBoarder });
             }
             catch (e) {

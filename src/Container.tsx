@@ -51,7 +51,6 @@ export default class Container extends React.Component<ContainerProps, Container
   onViewportChange = (viewportString?: string) => {
     try {
       const viewport: Viewport = JSON.parse(viewportString)
-      console.warn(`viewport changed ${JSON.stringify(viewport)}`)
       this.setState({ viewport })
     } catch (e) {
       console.error(`viewport change error ${JSON.stringify(e)}`)
@@ -59,7 +58,6 @@ export default class Container extends React.Component<ContainerProps, Container
   }
   onShowBoarderChange = (showBoarder: boolean) => {
     try {
-      console.warn(`viewport show boarder ${showBoarder}`)
       this.setState({ showBoarder })
     } catch (e) {
       console.error(`viewport boarder change error ${JSON.stringify(e)}`)

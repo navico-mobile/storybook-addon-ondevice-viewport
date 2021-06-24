@@ -19,8 +19,11 @@ export const withViewports = makeDecorator({
   allowDeprecatedUsage: true,
   wrapper: (getStory, context, { options, parameters }) => {
     const data: ViewportAddonParameter = parameters || options || {}
+    if (data.viewports || data.showBoarder || data.defaultViewport || data.disable) {
+      //if this parameter are different, set to viewport panel
+      addons.getChannel().emit(Events.SET, data)
+    }
     const initialViewPort = getInitialViewPort(data)
-    addons.getChannel().emit(Events.SET, data)
     return (
       <Container
         channel={addons.getChannel()}

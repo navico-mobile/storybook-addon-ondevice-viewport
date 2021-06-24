@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importDefault(require("react"));
 var react_native_1 = require("react-native");
+var core_events_1 = __importDefault(require("@storybook/core-events"));
 var constants_1 = __importDefault(require("./constants"));
 var defaults_1 = require("./defaults");
 var styles = react_native_1.StyleSheet.create({
@@ -83,6 +84,9 @@ var ViewportPanel = /** @class */ (function (_super) {
     __extends(ViewportPanel, _super);
     function ViewportPanel(props) {
         var _this = _super.call(this, props) || this;
+        _this.onStorySelected = function () {
+            _this.setState(__assign({}, defaultState));
+        };
         _this.onSetParameters = function (parameters) {
             var selected = parameters.defaultViewport || defaultState.selected;
             var disable = parameters.disable || defaultState.disable;
@@ -114,18 +118,20 @@ var ViewportPanel = /** @class */ (function (_super) {
     }
     ViewportPanel.prototype.componentDidMount = function () {
         this.props.channel.on(constants_1.default.SET, this.onSetParameters);
+        this.props.channel.on(core_events_1.default.SELECT_STORY, this.onStorySelected);
     };
     ViewportPanel.prototype.componentWillUnmount = function () {
         this.props.channel.removeListener(constants_1.default.SET, this.onSetParameters);
+        this.props.channel.removeListener(core_events_1.default.SELECT_STORY, this.onStorySelected);
     };
     ViewportPanel.prototype.render = function () {
-        var active = this.props.active;
+        var _a = this.props, active = _a.active, api = _a.api;
         if (!active || !this.state) {
             return null;
         }
-        var _a = this.state, selected = _a.selected, showBoarder = _a.showBoarder, disable = _a.disable, viewports = _a.viewports;
+        var _b = this.state, selected = _b.selected, showBoarder = _b.showBoarder, disable = _b.disable, viewports = _b.viewports;
         if (disable) {
-            return react_1.default.createElement(react_native_1.View, null, "Viewport is disabled");
+            return react_1.default.createElement(react_native_1.Text, null, "Viewport is disabled");
         }
         var viewportsList = getValidViewports(viewports, react_native_1.Dimensions.get('window'));
         return (react_1.default.createElement(react_native_1.View, { style: styles.container },

@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { AddonStore } from '@storybook/addons'
 import { API } from '@storybook/api'
+import CoreEvents from '@storybook/core-events'
 
 import Events from './constants'
 
@@ -18,6 +19,7 @@ import { INITIAL_VIEWPORTS, DEFAULT_VIEWPORT_NAME } from './defaults'
 import { Viewport, ViewportMap, ViewportAddonParameter } from './models'
 
 export type Channel = ReturnType<AddonStore['getChannel']>
+
 interface Props {
   channel: Channel
   api: API
@@ -82,12 +84,16 @@ export default class ViewportPanel extends React.Component<Props, States> {
   }
   componentDidMount() {
     this.props.channel.on(Events.SET, this.onSetParameters)
+    this.props.channel.on(CoreEvents.SELECT_STORY, this.onStorySelected)
   }
 
   componentWillUnmount() {
     this.props.channel.removeListener(Events.SET, this.onSetParameters)
+    this.props.channel.removeListener(CoreEvents.SELECT_STORY, this.onStorySelected)
   }
-
+  onStorySelected = () => {
+    this.setState({ ...defaultState })
+  }
   onSetParameters = (parameters: ViewportAddonParameter) => {
     const selected = parameters.defaultViewport || defaultState.selected
     const disable = parameters.disable || defaultState.disable
@@ -123,13 +129,13 @@ export default class ViewportPanel extends React.Component<Props, States> {
   }
 
   render() {
-    const { active } = this.props
+    const { active, api } = this.props
     if (!active || !this.state) {
       return null
     }
     const { selected, showBoarder, disable, viewports } = this.state
     if (disable) {
-      return <View>{`Viewport is disabled`}</View>
+      return <Text>{`Viewport is disabled`}</Text>
     }
 
     const viewportsList = getValidViewports(viewports, Dimensions.get('window'))

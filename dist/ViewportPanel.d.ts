@@ -18,6 +18,7 @@ export default class ViewportPanel extends React.Component<Props, States> {
     constructor(props: Props);
     componentDidMount(): void;
     componentWillUnmount(): void;
+    onStorySelected: () => void;
     onSetParameters: (parameters: ViewportAddonParameter) => void;
     onViewportSelect: (viewport: Viewport) => void;
     onViewportBorderChanged: (showBoarder: boolean) => void;

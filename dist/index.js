@@ -28,8 +28,11 @@ exports.withViewports = addons_1.makeDecorator({
     wrapper: function (getStory, context, _a) {
         var options = _a.options, parameters = _a.parameters;
         var data = parameters || options || {};
+        if (data.viewports || data.showBoarder || data.defaultViewport || data.disable) {
+            //if this parameter are different, set to viewport panel
+            addons_1.default.getChannel().emit(constants_1.default.SET, data);
+        }
         var initialViewPort = getInitialViewPort(data);
-        addons_1.default.getChannel().emit(constants_1.default.SET, data);
         return (React.createElement(Container_1.default, { channel: addons_1.default.getChannel(), showBoarder: data.showBoarder, initialViewport: initialViewPort }, getStory(context)));
     },
 });
